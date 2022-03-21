@@ -54,7 +54,7 @@ $ python <python file>
 Refer to [Replication.md] to reproduce the numbers reported in the paper.
 
 
-#### Note Sl-Corpus-X is refered as SLCX in the paper, where X is 0,1,2
+#### Note Sl-Corpus-X is referred as SLCX in the paper, where X is 0,1,2
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
    [Anaconda]: <https://www.anaconda.com/distribution/>
    [SLNET]: <https://zenodo.org/record/3911155#.Yjite4TMKV4>
