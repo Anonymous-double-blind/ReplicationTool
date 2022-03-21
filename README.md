@@ -60,3 +60,4 @@ Refer to [Replication.md] to reproduce the numbers reported in the paper.
    [SLNET]: <https://zenodo.org/record/3911155#.Yjite4TMKV4>
    [Analysis Data]: <https://zenodo.org/record/4915021#.Yjitx4TMKV4>
    [Replication.md]: <https://github.com/Anonymous-double-blind/ReplicationTool/blob/main/SLNET_Metrics-Extended/replication.md>
+   [SLNET-Metrics]: <https://github.com/50417/SLNET_Metrics>
