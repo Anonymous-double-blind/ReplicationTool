@@ -197,6 +197,42 @@ def get_model_abs_lifetime_meta(conn):
 
     return res
 
+def get_all_vals_from_table(conn,gsql , msql):
+    cur = conn.cursor()
+    cur.execute(gsql)
+    rows = cur.fetchall()
+    g_results = [r[0] for r in rows]
+
+    cur.execute(msql)
+    rows = cur.fetchall()
+    m_results = [r[0] for r in rows]
+
+    res = g_results + m_results
+    res.sort()
+    return res
+
+def get_code_generating_models_project(conn):
+    mat_embedded = "select count(distinct FILE_ID) from Matc_code_gen where System_Target_File in  ('ert.tlc','ert_shrlib.tlc') and Solver_Type =='Fixed-step' "
+    git_embedded = 'select count(distinct FILE_ID) from github_code_gen where System_Target_File in  ("ert.tlc","ert_shrlib.tlc") and Solver_Type =="Fixed-step" '
+    embedded = get_all_vals_from_table(conn,git_embedded,mat_embedded)
+    print(" Project with models configured to generate code using Embedded Coder ")
+    print("GitHub : {}".format(embedded[0] ))
+    print("MATLAB Central: {}".format(embedded[1] ))
+
+    mat_others = ' select count(distinct FILE_ID) from matc_code_gen where System_Target_File not in  ("ert.tlc","ert_shrlib.tlc") and (System_Target_File in ("rsim.tlc","rtwsun.tlc")  or Solver_Type =="Fixed-step") '
+    git_others = ' select count(distinct FILE_ID) from github_code_gen where System_Target_File not in  ("ert.tlc","ert_shrlib.tlc") and (System_Target_File in ("rsim.tlc","rtwsun.tlc")  or Solver_Type =="Fixed-step")  '
+    others = get_all_vals_from_table(conn,git_others,mat_others)
+    print(" Project with models configured to generate code using toolbox other than Embedded Coder ")
+    print("GitHub : {}".format(others[0] ))
+    print("MATLAB Central: {}".format(others[1] ))
+
+    mat_total = '  select count(distinct FILE_ID) from Matc_code_gen where System_Target_File in  ("rsim.tlc","rtwsun.tlc")  or ( System_Target_File not in  ("rsim.tlc","rtwsun.tlc") and Solver_Type =="Fixed-step")'
+    git_total = '  select count(distinct FILE_ID) from github_code_gen where System_Target_File in  ("rsim.tlc","rtwsun.tlc")  or ( System_Target_File not in  ("rsim.tlc","rtwsun.tlc") and Solver_Type =="Fixed-step")'
+    total = get_all_vals_from_table(conn,git_total,mat_total)
+    print(" Project with models configured to generate code using Embedded Coder ")
+    print("GitHub : {}".format(total[0] ))
+    print("MATLAB Central: {}".format(total[1] ))
+
 def get_model_rel_lifetime(conn):
     model_rl = "select relative_lifetime*100 from GitHub_Model_Commit_Info order by relative_lifetime"
     cur = conn.cursor()
@@ -254,6 +290,9 @@ def main():
     model_rel_lifetime = calculate_quartiles(get_model_rel_lifetime(conn))
     print("Relative lifetime in % &" + model_rel_lifetime)
     get_commits_info(conn)
+    
+    print('====================')
+    get_code_generating_models_project(conn)
 
 
 
