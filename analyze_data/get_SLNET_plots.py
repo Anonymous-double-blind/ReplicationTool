@@ -253,7 +253,7 @@ def get_general_metrics(conn):
     total_models = 9117
     mat_zero_mdl = "select SCHK_Block_count from matc_models where SCHK_Block_count=0"
     git_zero_mdl = "select SCHK_Block_count from github_models where SCHK_Block_count=0"
-    zero_mdl = get_all_vals_from_table(conn,mat_zero_mdl,git_zero_mdl)
+    zero_mdl = get_all_vals_from_table(conn,git_zero_mdl,mat_zero_mdl)
     print("Zero Block Models : {}".format( len(zero_mdl)))
 
     git_single_model = "select num_model_file from GitHub_Projects where num_model_file = 1"
@@ -282,18 +282,18 @@ def get_general_metrics(conn):
     print("Number of models with lines is greater or equal to Blocks:{}:{}".format(len(linesoverblocks),len(linesoverblocks)/total_models))
 
     mat_subsystem_zero = "Select Agg_SubSystem_count from matc_models where Agg_SubSystem_count=0 order by Agg_SubSystem_count"
-    git_subsystem_zero = "Select Agg_SubSystem_count from matc_models where Agg_SubSystem_count=0 order by Agg_SubSystem_count"
+    git_subsystem_zero = "Select Agg_SubSystem_count from github_models where Agg_SubSystem_count=0 order by Agg_SubSystem_count"
     subsystem_zero = get_all_vals_from_table(conn, git_subsystem_zero,mat_subsystem_zero)
     print("Number of  model  with zero subsystems:{}({})".format(len(subsystem_zero),len(subsystem_zero)/total_models))
 
     mat_subsystem_industrial = "Select Agg_SubSystem_count from matc_models where Agg_SubSystem_count>29 order by Agg_SubSystem_count"
-    git_subsystem_industrial = "Select Agg_SubSystem_count from matc_models where Agg_SubSystem_count>29 order by Agg_SubSystem_count"
+    git_subsystem_industrial = "Select Agg_SubSystem_count from github_models where Agg_SubSystem_count>29 order by Agg_SubSystem_count"
     subsystem_industrial = get_all_vals_from_table(conn, git_subsystem_industrial, mat_subsystem_industrial)
     print(
         "Number of  model  with 29 or more subsystems:{}({})".format(len(subsystem_industrial), len(subsystem_industrial) / total_models))
 
     mat_subsystem_industrial = "Select Agg_SubSystem_count from matc_models where Agg_SubSystem_count>1000 order by Agg_SubSystem_count"
-    git_subsystem_industrial = "Select Agg_SubSystem_count from matc_models where Agg_SubSystem_count>1000 order by Agg_SubSystem_count"
+    git_subsystem_industrial = "Select Agg_SubSystem_count from github_models where Agg_SubSystem_count>1000 order by Agg_SubSystem_count"
     subsystem_industrial = get_all_vals_from_table(conn, git_subsystem_industrial, mat_subsystem_industrial)
     print(
         "Number of  model  with 1000 or more subsystems:{}({})".format(len(subsystem_industrial),
@@ -366,6 +366,25 @@ def main():
     most_freq_blks,no_of_model = get_frequentlyusedBlocks(conn)
     name_abbr = {"DataTypeConversion": "DT-Conv", "PMComponent": "PMComp", "ToWorkspace": "ToW",
                  "RelationalOperator": "RelOp"}
+    
+    # Some of Simulink builtin library blocks is a Subsystem. So distinguishing  user created subsystem  and builtin blocks to only include models that has user created subsystem in the plot 
+    mat_subsystem_gt_zero = "Select Agg_SubSystem_count from matc_models where Agg_SubSystem_count>0 order by Agg_SubSystem_count"
+    git_subsystem_gt_zero = "Select Agg_SubSystem_count from github_models where Agg_SubSystem_count>0 order by Agg_SubSystem_count"
+    subsystem_gt_zero = get_all_vals_from_table(conn, git_subsystem_gt_zero,mat_subsystem_gt_zero)
+    total_gt_zero_subsystem_models = len(subsystem_gt_zero)
+
+    for i in range(len(most_freq_blks)):
+        if most_freq_blks[i] == 'SubSystem':
+            
+            no_of_model[i] = total_gt_zero_subsystem_models
+            break
+    
+    
+    
+    github_non_lib = "select id from github_models where is_lib = 0 and is_test = -1"
+    matc_non_lib = "select id from matc_models where is_lib = 0 and is_test = -1"
+    total_non_lib_models = get_all_vals_from_table(conn, github_non_lib,matc_non_lib)
+    non_lib_models = len(total_non_lib_models)
 
     most_freq_blks = abbreviate_names(most_freq_blks,name_abbr)
     plot(most_freq_blks,no_of_model, ylabel="Number of Models", figurename="most_freq_blks.pdf",xtickRot=90,abbr = name_abbr)
@@ -383,6 +402,7 @@ def main():
     print("Open Issues\t&" + calculate_quartiles(open_issues))
     print("Stargazers\t&"+ calculate_quartiles(stargazers))
     print("===================================================================")
+
 
 if __name__ == '__main__':
     main()
