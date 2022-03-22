@@ -64,6 +64,6 @@ For rest of the metrics, Update the dbfile to`` Sl-Corpus-2_exclude_lib.sqlite``
 	
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 [paper]:http://ranger.uta.edu/~csallner/papers/Chowdhury18Curated.pdf
-[here]:https://zenodo.org/record/4915021#.YSldoHVKhhE
+[here]:https://zenodo.org/record/6374469#.YjkRkITMJhE
 [SLNET]:https://zenodo.org/record/5259648#.Yjj854TMKV4
 
