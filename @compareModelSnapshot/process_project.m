@@ -4,17 +4,22 @@ function process_project(obj)
      sub_folder_num = length(all_sub_folders);
      obj.WriteLog(sprintf('Total Number of Project Snapshots = %d',sub_folder_num));
      
-     if isfile('token')
-         fileID = fopen('token','r');
-         start_cnt = fscanf(fileID,'%d');
-         fclose(fileID);
+     processing_folder_sql = ['SELECT Distinct Before_project_folder from ' char(obj.table_name) ];
+     results = fetch(obj.conn,processing_folder_sql);
+     
+     % Restart processing from the folder location which has not been fully
+     % processed (i.e. it has been processed both as before and after folder)
+     if ~isempty(results)
+         results_num = cellfun(@(x) str2double(x),results,'UniformOutput',false);
+         start_cnt = max(cell2mat(results_num));
          
          obj.WriteLog(sprintf('Deleting %d based comparison ',start_cnt));
          sqlquery = ['DELETE FROM ' char(obj.table_name) ' WHERE ' ...
-            'Before_Project_Folder >= ' char(num2str(start_cnt)) ' OR After_Project_Folder >= ' char(num2str(start_cnt))];
+            'Before_Project_Folder >= ' char(num2str(start_cnt)) ];
         obj.WriteLog(sprintf('SQL Query: %s ',sqlquery));
           
           exec(obj.conn,sqlquery);
+          start_cnt = start_cnt +1;
      else
          start_cnt = 2;
      end
@@ -29,9 +34,7 @@ function process_project(obj)
          
          
          obj.WriteLog(sprintf('=======Folder %d processed====== ',cnt-1));
-         token = fopen('token', 'w');
-         fprintf(token, '%d',cnt-1);
-         fclose(token);
+         
      
      end
      

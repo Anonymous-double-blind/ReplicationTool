@@ -28,11 +28,7 @@ classdef compareModelSnapshot
            obj.logfilename = strcat('Model_Snapshot_Compare',datestr(now, 'dd-mm-yy-HH-MM-SS'),'.txt');
            
            obj.WriteLog('open');
-           if isfile('token') %This token is responsible to creating a checkpoint in case the script failed.
-               % So dont initialize the object again as creating a new
-               % object will delete this token
-                delete('token');
-           end
+     
         
             if(~exist(obj.working_dir,'dir'))
                     mkdir(obj.working_dir);
@@ -58,6 +54,9 @@ classdef compareModelSnapshot
         output_bol = write_to_database(obj,before_sha, after_sha,model,before_folder, after_folder,comparison_res_table);
         process_two_project_versions(obj,project_before, project_after);  
         process_project(obj,project);
+        
+        
+        %PLoting UTILS
     end
 end
 
