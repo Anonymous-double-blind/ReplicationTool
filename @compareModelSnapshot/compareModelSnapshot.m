@@ -56,7 +56,19 @@ classdef compareModelSnapshot
         process_project(obj,project);
         
         
-        %PLoting UTILS
+        %Replication and plots
+        %ChangeType and counts
+        nodeandchangetype_count_map = get_nodeandchangetype_count_map(obj);
+        res_vector = get_vector_per_node_type(obj, node_type,nodeandchangetype_count_map);
+        
+        %block Type and counts
+        [blk_type_name, blk_count] = get_block_type_and_count(obj);
+        
+        %]
+        [blocktype_changetype,median_of_change] = get_median_of_block_change_per_commit(obj);
+        % 
+        [changetype,median_no_of_change] = get_median_of_node_change_per_commit(obj,nodetype);
+        replicate_plots_and_results(obj);
     end
 end
 
