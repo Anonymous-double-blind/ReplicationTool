@@ -18,6 +18,7 @@ classdef compareModelSnapshot
         conn;
         table_name;
         logfilename;
+        blk_category_map;
     end
     
     methods
@@ -37,6 +38,29 @@ classdef compareModelSnapshot
             obj.table_name = "Model_Comparison_Across_Commit";
             obj.conn = obj.connect_db_and_create_table(db,obj.table_name);
             
+            %Block Category
+            
+            block_lib_map = utils.getblock_library_map();
+            block = keys(block_lib_map);
+            obj.blk_category_map = containers.Map();
+            categories = java.util.HashSet;
+        
+            for i = 1:length(block)
+                lib = block_lib_map(block{i}); % cell 
+                blk_type = block{i};
+                category = utils.get_category(blk_type,lib{1},true);
+                categories.add(category);
+                if ~isKey(obj.blk_category_map,category)
+                    obj.blk_category_map(category) = java.util.HashSet;
+                    obj.blk_category_map(category).add(blk_type);
+                else
+                    obj.blk_category_map(category).add(blk_type);
+                end
+            
+            end
+            obj.blk_category_map('Structural').add('Reference');
+             obj.blk_category_map('Trigger').add('ActionPort');
+            utils.print_map(obj.blk_category_map);
            %Adding the utility in the matlab path
            addpath(genpath(model_comparison_utility_folder));
            
@@ -62,12 +86,14 @@ classdef compareModelSnapshot
         res_vector = get_vector_per_node_type(obj, node_type,nodeandchangetype_count_map);
         
         %block Type and counts
-        [blk_type_name, blk_count] = get_block_type_and_count(obj);
+        [blk_type_name, blk_count] = get_block_type_and_count_over_20(obj);
         
-        %]
+       
         [blocktype_changetype,median_of_change] = get_median_of_block_change_per_commit(obj);
-        % 
         [changetype,median_no_of_change] = get_median_of_node_change_per_commit(obj,nodetype);
+        
+        %bubbble chart category change
+        [category, category_change_percent] = get_blocktype_blockpath_count(obj);
         replicate_plots_and_results(obj);
     end
 end
