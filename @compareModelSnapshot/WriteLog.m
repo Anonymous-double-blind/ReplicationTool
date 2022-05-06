@@ -23,7 +23,7 @@
         end
         % Write to the screen at the same time:
         
-            fprintf('%s: %s\n', datestr(now, 'dd/mm/yy-HH:MM:SS'), Data);
+            %fprintf('%s: %s\n', datestr(now, 'dd/mm/yy-HH:MM:SS'), Data);
  
 end
         
